@@ -11,6 +11,7 @@ const sqlConfig: SqlServerConfig = {
   database: 'excel_import',
   user: 'sa',
   password: 'secret',
+  trustServerCertificate: true,
 };
 
 const sampleRows: UnifiedImportRow[] = [

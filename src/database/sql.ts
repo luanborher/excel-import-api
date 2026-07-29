@@ -11,7 +11,7 @@ export function toSqlServerConnectionConfig(config: SqlServerConfig): sql.config
     password: config.password,
     options: {
       encrypt: true,
-      trustServerCertificate: true,
+      trustServerCertificate: config.trustServerCertificate,
     },
     connectionTimeout: 5_000,
     requestTimeout: 30_000,

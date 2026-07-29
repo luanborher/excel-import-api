@@ -10,6 +10,10 @@ const envSchema = z
     SQL_SERVER_DATABASE: z.string().optional(),
     SQL_SERVER_USER: z.string().optional(),
     SQL_SERVER_PASSWORD: z.string().optional(),
+    SQL_SERVER_TRUST_CERTIFICATE: z
+      .enum(['true', 'false'])
+      .default('true')
+      .transform((v) => v === 'true'),
     IMPORT_MAX_FILE_SIZE_MB: z.coerce.number().int().positive().max(50).default(10),
   })
   .superRefine((data, ctx) => {

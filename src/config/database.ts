@@ -6,6 +6,7 @@ export type SqlServerConfig = {
   database: string;
   user: string;
   password: string;
+  trustServerCertificate: boolean;
 };
 
 export function resolveSqlServerConfig(env: Env): SqlServerConfig | null {
@@ -20,5 +21,6 @@ export function resolveSqlServerConfig(env: Env): SqlServerConfig | null {
     database: env.SQL_SERVER_DATABASE!.trim(),
     user: env.SQL_SERVER_USER!.trim(),
     password: env.SQL_SERVER_PASSWORD!,
+    trustServerCertificate: env.SQL_SERVER_TRUST_CERTIFICATE,
   };
 }
