@@ -84,17 +84,19 @@ async function insertRowsChunk(
     const pedidoKey = `pedido_id_${String(index)}`;
     const clienteKey = `cliente_id_${String(index)}`;
     const valorKey = `valor_${String(index)}`;
+    const produtoKey = `produto_${String(index)}`;
     const nomeKey = `cliente_nome_${String(index)}`;
     const emailKey = `cliente_email_${String(index)}`;
 
     request.input(pedidoKey, sql.Int, row.pedidoId);
     request.input(clienteKey, sql.Int, row.clienteId);
     request.input(valorKey, sql.Decimal(18, 2), row.valor);
+    request.input(produtoKey, sql.NVarChar(255), row.produto);
     request.input(nomeKey, sql.NVarChar(255), row.clienteNome);
     request.input(emailKey, sql.NVarChar(255), row.clienteEmail);
 
     valueTuples.push(
-      `(@import_batch_id, @${pedidoKey}, @${clienteKey}, @${valorKey}, @${nomeKey}, @${emailKey})`,
+      `(@import_batch_id, @${pedidoKey}, @${clienteKey}, @${valorKey}, @${produtoKey}, @${nomeKey}, @${emailKey})`,
     );
   });
 
@@ -104,6 +106,7 @@ async function insertRowsChunk(
       pedido_id,
       cliente_id,
       valor,
+      produto,
       cliente_nome,
       cliente_email
     ) VALUES ${valueTuples.join(', ')};

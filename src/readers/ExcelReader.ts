@@ -21,7 +21,7 @@ export type ExcelSheet = {
 };
 
 const CLIENTES_COLUMNS = ['id', 'nome', 'email'] as const;
-const PEDIDOS_COLUMNS = ['id', 'cliente_id', 'valor'] as const;
+const PEDIDOS_COLUMNS = ['id', 'cliente_id', 'valor', 'produto'] as const;
 
 function resolveWorksheet(workbook: ExcelJS.Workbook, sheetIndex = 1): ExcelJS.Worksheet {
   const worksheet = workbook.getWorksheet(sheetIndex);
@@ -115,6 +115,7 @@ export class ExcelReader {
       id: getCellNumber(row, 'id'),
       clienteId: getCellNumber(row, 'cliente_id'),
       valor: getCellNumber(row, 'valor'),
+      produto: getCellString(row, 'produto') ?? '',
     }));
   }
 }

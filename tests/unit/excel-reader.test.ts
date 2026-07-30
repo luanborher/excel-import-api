@@ -27,7 +27,7 @@ describe('leitura do Excel', () => {
   it('lê cabeçalhos e linhas da planilha de pedidos', async () => {
     const sheet = await reader.readSheet(FIXTURE_PATHS.pedidos);
 
-    expect(sheet.headers).toEqual(['id', 'cliente_id', 'valor']);
+    expect(sheet.headers).toEqual(['id', 'cliente_id', 'valor', 'produto']);
     expect(sheet.rows).toHaveLength(2);
   });
 
@@ -44,7 +44,7 @@ describe('leitura do Excel', () => {
   it('lê pedidos mapeando cliente_id para clienteId', async () => {
     const pedidos = await reader.readPedidos(FIXTURE_PATHS.pedidos);
 
-    expect(pedidos[0]).toEqual({ id: 101, clienteId: 1, valor: 150.5 });
+    expect(pedidos[0]).toEqual({ id: 101, clienteId: 1, valor: 150.5, produto: 'Notebook' });
   });
 
   it('falha quando o arquivo não existe', async () => {

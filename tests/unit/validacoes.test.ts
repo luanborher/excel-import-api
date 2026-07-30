@@ -14,13 +14,16 @@ const clientes: Cliente[] = [
 ];
 
 const pedidos: Pedido[] = [
-  { id: 101, clienteId: 1, valor: 150.5 },
-  { id: 102, clienteId: 2, valor: 89.9 },
+  { id: 101, clienteId: 1, valor: 150.5, produto: 'Notebook' },
+  { id: 102, clienteId: 2, valor: 89.9, produto: 'Mouse' },
 ];
 
 describe('validações de relacionamento', () => {
   it('rejeita pedidos órfãos (cliente_id inexistente)', () => {
-    const pedidosComOrfao: Pedido[] = [...pedidos, { id: 103, clienteId: 999, valor: 42 }];
+    const pedidosComOrfao: Pedido[] = [
+      ...pedidos,
+      { id: 103, clienteId: 999, valor: 42, produto: 'X' },
+    ];
 
     expect(() => relateClientesPedidos(clientes, pedidosComOrfao)).toThrow(ImportRelationError);
 
@@ -42,8 +45,8 @@ describe('validações de relacionamento', () => {
 
   it('rejeita pedidos com id duplicado na planilha', () => {
     const pedidosDuplicados: Pedido[] = [
-      { id: 101, clienteId: 1, valor: 10 },
-      { id: 101, clienteId: 2, valor: 20 },
+      { id: 101, clienteId: 1, valor: 10, produto: 'A' },
+      { id: 101, clienteId: 2, valor: 20, produto: 'B' },
     ];
 
     expect(() => relateClientesPedidos(clientes, pedidosDuplicados)).toThrow(ImportRelationError);

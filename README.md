@@ -185,6 +185,6 @@ docker/
 | Arquivo | Colunas obrigatórias |
 |---------|----------------------|
 | `clientes.xlsx` | `id`, `nome`, `email` |
-| `pedidos.xlsx` | `id`, `cliente_id`, `valor` |
+| `pedidos.xlsx` | `id`, `cliente_id`, `valor`, `produto` |
 
 Pedidos com `cliente_id` inexistente na planilha de clientes retornam **422** (`ORPHAN_PEDIDOS`).

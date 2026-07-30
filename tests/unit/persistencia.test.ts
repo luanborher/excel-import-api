@@ -19,6 +19,7 @@ const sampleRows: UnifiedImportRow[] = [
     pedidoId: 101,
     clienteId: 1,
     valor: 10,
+    produto: 'Notebook',
     clienteNome: 'Ana',
     clienteEmail: 'ana@example.com',
   },

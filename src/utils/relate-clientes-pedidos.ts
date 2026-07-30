@@ -67,6 +67,7 @@ export function relateClientesPedidos(
       pedidoId: pedido.id,
       clienteId: cliente.id,
       valor: pedido.valor,
+      produto: pedido.produto,
       clienteNome: cliente.nome,
       clienteEmail: cliente.email,
     });

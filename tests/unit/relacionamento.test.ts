@@ -10,8 +10,8 @@ const clientes: Cliente[] = [
 ];
 
 const pedidos: Pedido[] = [
-  { id: 101, clienteId: 1, valor: 150.5 },
-  { id: 102, clienteId: 2, valor: 89.9 },
+  { id: 101, clienteId: 1, valor: 150.5, produto: 'Notebook' },
+  { id: 102, clienteId: 2, valor: 89.9, produto: 'Mouse' },
 ];
 
 describe('relacionamento clientes e pedidos', () => {
@@ -23,6 +23,7 @@ describe('relacionamento clientes e pedidos', () => {
         pedidoId: 101,
         clienteId: 1,
         valor: 150.5,
+        produto: 'Notebook',
         clienteNome: 'Ana Silva',
         clienteEmail: 'ana@example.com',
       },
@@ -30,6 +31,7 @@ describe('relacionamento clientes e pedidos', () => {
         pedidoId: 102,
         clienteId: 2,
         valor: 89.9,
+        produto: 'Mouse',
         clienteNome: 'Bruno Costa',
         clienteEmail: null,
       },

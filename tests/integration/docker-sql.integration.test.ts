@@ -43,6 +43,7 @@ describe.skipIf(!integrationEnabled)('integração SQL (Docker)', () => {
         pedidoId,
         clienteId: 1,
         valor: 12.34,
+        produto: 'Teclado',
         clienteNome: 'Integração SQL',
         clienteEmail: 'sql@test.local',
       },

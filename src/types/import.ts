@@ -4,6 +4,7 @@ export type UnifiedImportRow = {
   pedidoId: number;
   clienteId: number;
   valor: number;
+  produto: string;
   clienteNome: string;
   clienteEmail: string | null;
 };
