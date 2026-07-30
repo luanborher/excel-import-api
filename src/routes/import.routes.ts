@@ -16,14 +16,7 @@ export function registerImportRoutes(
       schema: {
         tags: ['import'],
         summary: 'Importa planilhas clientes e pedidos',
-        description:
-          'Multipart form com campos `clientes` e `pedidos` (.xlsx). Query opcional: orphanPolicy=fail|skip.',
-        querystring: {
-          type: 'object',
-          properties: {
-            orphanPolicy: { type: 'string', enum: ['fail', 'skip'] },
-          },
-        },
+        description: 'Multipart form com campos `clientes` e `pedidos` (.xlsx).',
         consumes: ['multipart/form-data'],
         response: {
           201: {

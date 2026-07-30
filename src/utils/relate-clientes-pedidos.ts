@@ -3,15 +3,8 @@ import type { Pedido } from '../models/Pedido.js';
 import type { UnifiedImportRow } from '../types/import.js';
 import { ImportRelationError, type OrphanPedido } from '../errors/ImportRelationError.js';
 
-export type OrphanPedidoPolicy = 'fail' | 'skip';
-
-export type RelateClientesPedidosOptions = {
-  orphanPolicy?: OrphanPedidoPolicy;
-};
-
 export type RelateClientesPedidosResult = {
   rows: UnifiedImportRow[];
-  skippedPedidos: OrphanPedido[];
 };
 
 function buildClienteIndex(clientes: Cliente[]): Map<number, Cliente> {
@@ -51,9 +44,7 @@ function assertUniquePedidoIds(pedidos: Pedido[]): void {
 export function relateClientesPedidos(
   clientes: Cliente[],
   pedidos: Pedido[],
-  options: RelateClientesPedidosOptions = {},
 ): RelateClientesPedidosResult {
-  const orphanPolicy = options.orphanPolicy ?? 'fail';
   const clienteIndex = buildClienteIndex(clientes);
   assertUniquePedidoIds(pedidos);
 
@@ -81,7 +72,7 @@ export function relateClientesPedidos(
     });
   }
 
-  if (orphans.length > 0 && orphanPolicy === 'fail') {
+  if (orphans.length > 0) {
     throw new ImportRelationError(
       'Pedidos com cliente_id inexistente na planilha de clientes',
       'ORPHAN_PEDIDOS',
@@ -91,8 +82,5 @@ export function relateClientesPedidos(
     );
   }
 
-  return {
-    rows,
-    skippedPedidos: orphanPolicy === 'skip' ? orphans : [],
-  };
+  return { rows };
 }

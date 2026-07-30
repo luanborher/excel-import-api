@@ -62,7 +62,7 @@ describe.skipIf(!integrationEnabled)('E2E HTTP + SQL (Docker)', () => {
     const { payload, headers } = await buildImportMultipartPayload();
     const response = await app.inject({
       method: 'POST',
-      url: '/api/v1/import?orphanPolicy=skip',
+      url: '/api/v1/import',
       payload,
       headers,
     });
@@ -72,7 +72,6 @@ describe.skipIf(!integrationEnabled)('E2E HTTP + SQL (Docker)', () => {
       data: {
         rowsInserted: 2,
         unifiedRows: 2,
-        skippedPedidos: [{ pedidoId: 103, clienteId: 999, valor: 42 }],
       },
     });
 

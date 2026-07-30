@@ -27,7 +27,7 @@ npm run dev
 ```bash
 npm run fixtures
 curl http://localhost:3000/health
-curl -X POST "http://localhost:3000/api/v1/import?orphanPolicy=skip" \
+curl -X POST "http://localhost:3000/api/v1/import" \
   -F "clientes=@tests/fixtures/clientes.xlsx" \
   -F "pedidos=@tests/fixtures/pedidos.xlsx"
 ```
@@ -113,12 +113,12 @@ docker compose down
 |--------|------------------|-----------|
 | GET    | `/health`        | Liveness |
 | GET    | `/health/ready`  | Readiness — verifica SQL Server quando configurado no `.env` |
-| POST   | `/api/v1/import` | Multipart: `clientes` + `pedidos` (.xlsx). Query: `orphanPolicy=fail\|skip` |
+| POST   | `/api/v1/import` | Multipart: `clientes` + `pedidos` (.xlsx) |
 
 Com Docker e `.env` SQL configurados (gere as planilhas com `npm run fixtures`):
 
 ```bash
-curl -X POST "http://localhost:3000/api/v1/import?orphanPolicy=skip" \
+curl -X POST "http://localhost:3000/api/v1/import" \
   -F "clientes=@tests/fixtures/clientes.xlsx" \
   -F "pedidos=@tests/fixtures/pedidos.xlsx"
 ```
@@ -187,4 +187,4 @@ docker/
 | `clientes.xlsx` | `id`, `nome`, `email` |
 | `pedidos.xlsx` | `id`, `cliente_id`, `valor` |
 
-Política de pedidos órfãos: `orphanPolicy=fail` (padrão) ou `skip`.
+Pedidos com `cliente_id` inexistente na planilha de clientes retornam **422** (`ORPHAN_PEDIDOS`).

@@ -105,15 +105,13 @@ Reexporta `loadEnv`, `getImportMaxFileSizeBytes`, `resolveSqlServerConfig` e tip
 | Método | O que faz |
 |--------|-----------|
 | `constructor(importService, maxFileSizeBytes)` | Guarda dependências injetadas na criação das rotas. |
-| `import(request, reply)` | 1) Garante que o serviço existe; 2) extrai buffers `clientes` e `pedidos`; 3) lê `orphanPolicy` da query; 4) chama `importSpreadsheets`; 5) responde **201** com `{ data: report }`. |
+| `import(request, reply)` | 1) Garante que o serviço existe; 2) extrai buffers `clientes` e `pedidos`; 3) chama `importSpreadsheets`; 4) responde **201** com `{ data: report }`. |
 
 ### `src/utils/multipart.ts`
 
 | Função | O que faz |
 |--------|-----------|
 | `parseImportMultipart(request, maxFileSizeBytes)` | Itera partes multipart, aceita só campos `clientes` e `pedidos`, valida tamanho por arquivo e retorna dois `Buffer`. |
-| `parseOrphanPolicy(value)` | Interpreta query `orphanPolicy=fail|skip`; valor inválido → `BadRequestError`. |
-
 ---
 
 ## 5. Caso de uso — serviço de importação
@@ -164,10 +162,7 @@ Reexporta `loadEnv`, `getImportMaxFileSizeBytes`, `resolveSqlServerConfig` e tip
 
 | Função / tipo | O que faz |
 |---------------|-----------|
-| `relateClientesPedidos(clientes, pedidos, options?)` | Para cada pedido, busca o cliente pelo `clienteId` e monta `UnifiedImportRow` (dados do pedido + nome/email do cliente). |
-| `buildClienteIndex` (interna) | Indexa clientes por `id`; **rejeita** `id` duplicado na planilha de clientes. |
-| `assertUniquePedidoIds` (interna) | **Rejeita** `id` de pedido duplicado na planilha de pedidos. |
-| Política `orphanPolicy` | `fail` (padrão): pedido sem cliente na planilha → `ImportRelationError`. `skip`: ignora órfãos e lista em `skippedPedidos`. |
+| `relateClientesPedidos` | Para cada pedido, busca o cliente pelo `clienteId`. Pedido sem cliente na planilha → `ImportRelationError` (422). |
 
 ### `src/models/Cliente.ts` / `src/models/Pedido.ts`
 
@@ -182,7 +177,7 @@ Tipos de domínio após parse da planilha:
 |------|------------------|
 | `ExcelInput` | Caminho de arquivo ou buffer para o leitor. |
 | `UnifiedImportRow` | Linha pronta para gravar: pedido + cliente desnormalizado. |
-| `ImportInput` | Entrada do serviço: buffers, `orphanPolicy`, `batchId` opcional. |
+| `ImportInput` | Entrada do serviço: buffers e `batchId` opcional. |
 | `ImportReport` | Relatório da importação retornado na API. |
 | `PersistImportResult` | Resultado do insert SQL (batch, contagem, nome da tabela). |
 
@@ -226,7 +221,7 @@ Durante qualquer etapa acima, erros tipados sobem até o error handler do Fastif
 
 | Classe | HTTP | Quando |
 |--------|------|--------|
-| `BadRequestError` | 400 | Multipart inválido, arquivo grande, `orphanPolicy` inválido. |
+| `BadRequestError` | 400 | Multipart inválido ou arquivo grande. |
 | `ExcelReadError` | 400 | Planilha ilegível, coluna faltando, célula inválida. |
 | `ImportRelationError` | 422 | Órfãos com `fail`, IDs duplicados. |
 | `SqlPersistenceError` | 503 | Falha de conexão, DDL ou insert no SQL. |
@@ -296,15 +291,13 @@ Corpo **201**:
     "batchId": "uuid-do-lote",
     "tableName": "import_unified",
     "rowsInserted": 2,
-    "unifiedRows": 2,
-    "skippedPedidos": []
+    "unifiedRows": 2
   }
 }
 ```
 
 - **batchId:** identificador do lote na tabela SQL.
-- **rowsInserted / unifiedRows:** quantidade de linhas unificadas gravadas (iguais quando o insert completa tudo).
-- **skippedPedidos:** preenchido quando `orphanPolicy=skip` e existem pedidos sem cliente na planilha de clientes.
+- **rowsInserted / unifiedRows:** quantidade de linhas unificadas gravadas.
 
 ---
 

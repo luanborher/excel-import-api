@@ -2,7 +2,7 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
 
 import { ServiceUnavailableError } from '../errors/HttpErrors.js';
 import type { ImportService } from '../services/ImportService.js';
-import { parseImportMultipart, parseOrphanPolicy } from '../utils/multipart.js';
+import { parseImportMultipart } from '../utils/multipart.js';
 
 export class ImportController {
   constructor(
@@ -19,14 +19,10 @@ export class ImportController {
     }
 
     const { clientes, pedidos } = await parseImportMultipart(request, this.maxFileSizeBytes);
-    const orphanPolicy = parseOrphanPolicy(
-      (request.query as { orphanPolicy?: string }).orphanPolicy,
-    );
 
     const report = await this.importService.importSpreadsheets({
       clientes,
       pedidos,
-      orphanPolicy,
     });
 
     await reply.status(201).send({ data: report });

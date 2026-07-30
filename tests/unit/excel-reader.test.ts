@@ -28,7 +28,7 @@ describe('leitura do Excel', () => {
     const sheet = await reader.readSheet(FIXTURE_PATHS.pedidos);
 
     expect(sheet.headers).toEqual(['id', 'cliente_id', 'valor']);
-    expect(sheet.rows).toHaveLength(3);
+    expect(sheet.rows).toHaveLength(2);
   });
 
   it('lê clientes a partir de buffer em memória', async () => {

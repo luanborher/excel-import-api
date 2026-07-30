@@ -25,7 +25,6 @@ export async function writeExcelFixtures(): Promise<void> {
   pedidosSheet.addRow(['id', 'cliente_id', 'valor']);
   pedidosSheet.addRow([101, 1, 150.5]);
   pedidosSheet.addRow([102, 2, 89.9]);
-  pedidosSheet.addRow([103, 999, 42]);
   await pedidosWorkbook.xlsx.writeFile(FIXTURE_PATHS.pedidos);
 
   const invalidWorkbook = new ExcelJS.Workbook();

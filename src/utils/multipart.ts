@@ -55,15 +55,3 @@ export async function parseImportMultipart(
     pedidos: files.pedidos,
   };
 }
-
-export function parseOrphanPolicy(value: string | undefined): 'fail' | 'skip' | undefined {
-  if (!value) {
-    return undefined;
-  }
-
-  if (value === 'fail' || value === 'skip') {
-    return value;
-  }
-
-  throw new BadRequestError('Query "orphanPolicy" deve ser "fail" ou "skip"');
-}

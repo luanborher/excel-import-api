@@ -34,22 +34,11 @@ describe('relacionamento clientes e pedidos', () => {
         clienteEmail: null,
       },
     ]);
-    expect(result.skippedPedidos).toEqual([]);
-  });
-
-  it('com orphanPolicy skip relaciona pedidos válidos e lista órfãos separadamente', () => {
-    const pedidosComOrfao: Pedido[] = [...pedidos, { id: 103, clienteId: 999, valor: 42 }];
-
-    const result = relateClientesPedidos(clientes, pedidosComOrfao, { orphanPolicy: 'skip' });
-
-    expect(result.rows).toHaveLength(2);
-    expect(result.skippedPedidos).toEqual([{ pedidoId: 103, clienteId: 999, valor: 42 }]);
   });
 
   it('retorna listas vazias quando não há pedidos', () => {
     const result = relateClientesPedidos(clientes, []);
 
     expect(result.rows).toEqual([]);
-    expect(result.skippedPedidos).toEqual([]);
   });
 });
