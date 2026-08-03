@@ -1,11 +1,12 @@
 import 'dotenv/config';
 
 import { randomInt, randomUUID } from 'node:crypto';
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { createApp } from '../../src/app.js';
 import { loadEnv, resolveSqlServerConfig } from '../../src/config/index.js';
-import { pingSqlServer } from '../../src/database/sql.js';
+import { runMigrations } from '../../src/database/migrate.js';
+import { closeSqlServerPool, pingSqlServer } from '../../src/database/sql.js';
 import { ImportRepository } from '../../src/repositories/ImportRepository.js';
 import { writeExcelFixtures } from '../helpers/excel-fixtures.js';
 import { buildImportMultipartPayload } from '../helpers/multipart.js';
@@ -31,6 +32,12 @@ async function canRunSqlIntegration(): Promise<boolean> {
 const integrationEnabled = await canRunSqlIntegration();
 
 describe.skipIf(!integrationEnabled)('integração SQL (Docker)', () => {
+  beforeAll(async () => {
+    const env = loadEnv({ ...process.env, NODE_ENV: 'test' });
+    const config = resolveSqlServerConfig(env)!;
+    await runMigrations(config);
+  });
+
   it('persiste lote na tabela import_unified', async () => {
     const env = loadEnv({ ...process.env, NODE_ENV: 'test' });
     const config = resolveSqlServerConfig(env)!;
@@ -55,6 +62,12 @@ describe.skipIf(!integrationEnabled)('integração SQL (Docker)', () => {
 });
 
 describe.skipIf(!integrationEnabled)('E2E HTTP + SQL (Docker)', () => {
+  beforeAll(async () => {
+    const env = loadEnv({ ...process.env, NODE_ENV: 'test' });
+    const config = resolveSqlServerConfig(env)!;
+    await runMigrations(config);
+  });
+
   it('POST /api/v1/import retorna 201 com relatório', async () => {
     await writeExcelFixtures();
     const env = loadEnv({ ...process.env, NODE_ENV: 'test' });
@@ -85,6 +98,12 @@ describe.skipIf(!integrationEnabled)('E2E HTTP + SQL (Docker)', () => {
 
     await app.close();
   });
+});
+
+afterAll(async () => {
+  if (integrationEnabled) {
+    await closeSqlServerPool();
+  }
 });
 
 describe('integração SQL (guard)', () => {

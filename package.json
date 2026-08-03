@@ -17,6 +17,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "fixtures": "tsx scripts/generate-fixtures.ts",
+    "migrate": "tsx src/database/migrate-cli.ts",
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "ci": "npm run format:check && npm run lint && npm run build && npm test"
   },

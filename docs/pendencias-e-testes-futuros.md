@@ -38,7 +38,7 @@ npm run test:integration
 
 ### SQL / produção
 
-- [ ] Migrations versionadas (Flyway/dbmate) em vez de DDL inline
+- [x] Migrations versionadas (`npm run migrate`) em vez de DDL inline na conexão
 - [ ] Índices adicionais se consultas por `cliente_id` forem frequentes
 - [ ] Job CI com service container SQL (GitHub Actions)
 

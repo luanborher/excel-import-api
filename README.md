@@ -16,7 +16,13 @@ docker compose up -d
 
 1. O **`.env` é obrigatório antes** do `docker compose` (senha `SQL_SERVER_PASSWORD` é usada pelos containers).
 2. Aguarde o container `excel-import-sqlserver` ficar **healthy** (pode levar ~1 minuto na primeira vez).
-3. Suba a API:
+3. Aplique as migrations do banco (uma vez por ambiente):
+
+```bash
+npm run migrate
+```
+
+4. Suba a API:
 
 ```bash
 npm run dev
@@ -77,7 +83,13 @@ Subir o banco e criar o database `excel_import`:
 docker compose up -d
 ```
 
-Aguarde o container `excel-import-sqlserver` ficar healthy. O serviço `sqlserver-init` roda o script `docker/sqlserver/init.sql` uma vez.
+Aguarde o container `excel-import-sqlserver` ficar healthy. O serviço `sqlserver-init` roda o script `docker/sqlserver/init.sql` uma vez (cria apenas o database `excel_import`).
+
+Depois, aplique o schema da aplicação:
+
+```bash
+npm run migrate
+```
 
 Parar:
 
@@ -89,6 +101,7 @@ docker compose down
 
 | Comando        | Descrição                          |
 |----------------|------------------------------------|
+| `npm run migrate` | Aplica migrations pendentes no SQL Server (uma vez por ambiente) |
 | `npm run dev`  | Servidor em modo watch (tsx)       |
 | `npm run fixtures` | Gera `tests/fixtures/*.xlsx` para testes manuais |
 | `npm run build`| Compila TypeScript para `dist/`    |
@@ -148,7 +161,9 @@ src/
 ├── readers/
 │   └── ExcelReader.ts
 ├── database/
-│   └── sql.ts          # Pool, ping, DDL import_unified
+│   ├── sql.ts          # Pool e ping SQL Server
+│   ├── migrate.ts      # Runner de migrations
+│   └── migrations/     # Scripts versionados (executados uma vez)
 ├── models/
 │   ├── Cliente.ts
 │   └── Pedido.ts

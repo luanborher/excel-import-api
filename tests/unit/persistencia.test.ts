@@ -46,7 +46,6 @@ vi.mock('../../src/database/sql.js', () => ({
       request: requestFromPool,
     }),
   ),
-  CREATE_IMPORT_UNIFIED_TABLE_SQL: 'CREATE TABLE import_unified',
   IMPORT_UNIFIED_TABLE: 'import_unified',
 }));
 
@@ -79,14 +78,6 @@ describe('persistência SQL (ImportRepository)', () => {
     rollbackMock.mockResolvedValue(undefined);
   });
 
-  it('garante schema executando DDL no pool', async () => {
-    const repository = new ImportRepository(sqlConfig);
-
-    await repository.ensureSchema();
-
-    expect(poolQueryMock).toHaveBeenCalledWith('CREATE TABLE import_unified');
-  });
-
   it('insere lote em transação e faz commit', async () => {
     const repository = new ImportRepository(sqlConfig);
     const batchId = '11111111-1111-1111-1111-111111111111';
@@ -117,9 +108,7 @@ describe('persistência SQL (ImportRepository)', () => {
   });
 
   it('faz rollback e lança SqlPersistenceError quando insert falha', async () => {
-    transactionQueryMock
-      .mockResolvedValueOnce(undefined)
-      .mockRejectedValueOnce(new Error('constraint violation'));
+    transactionQueryMock.mockRejectedValueOnce(new Error('constraint violation'));
     const repository = new ImportRepository(sqlConfig);
 
     await expect(repository.insertBatch('fail-batch', sampleRows)).rejects.toBeInstanceOf(
@@ -128,12 +117,5 @@ describe('persistência SQL (ImportRepository)', () => {
 
     expect(rollbackMock).toHaveBeenCalledOnce();
     expect(commitMock).not.toHaveBeenCalled();
-  });
-
-  it('lança SqlPersistenceError quando ensureSchema falha', async () => {
-    poolQueryMock.mockRejectedValueOnce(new Error('connection refused'));
-    const repository = new ImportRepository(sqlConfig);
-
-    await expect(repository.ensureSchema()).rejects.toBeInstanceOf(SqlPersistenceError);
   });
 });

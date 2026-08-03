@@ -27,7 +27,8 @@ services/ImportService.importSpreadsheets
     │
     └─► repositories/ImportRepository.insertBatch
             │
-            └─► database/sql.ts (pool + DDL)
+            └─► database/sql.ts (pool)
+            └─► database/migrate.ts (schema — comando separado)
     │
     ▼
 Resposta 201 { data: ImportReport }
@@ -189,9 +190,14 @@ Tipos de domínio após parse da planilha:
 
 | Método / função | O que faz |
 |-----------------|-----------|
-| `ensureSchema()` | Executa DDL de criação da tabela `import_unified` (uso manual/migração; o fluxo normal usa DDL dentro da transação de insert). |
-| `insertBatch(batchId, rows)` | Se `rows` vazio, retorna sem transação. Senão: abre transação, garante tabela, insere em **chunks de 100 linhas** por statement, commit. Erro → rollback e `SqlPersistenceError`. |
+| `insertBatch(batchId, rows)` | Se `rows` vazio, retorna sem transação. Senão: abre transação, insere em **chunks de 100 linhas** por statement, commit. Erro → rollback e `SqlPersistenceError`. |
 | `insertRowsChunk` (interna) | Monta um `INSERT` multi-linha parametrizado para um chunk. |
+
+### `src/database/migrate.ts`
+
+| Função | O que faz |
+|--------|-----------|
+| `runMigrations(config)` | Garante tabela `schema_migrations`, aplica cada migration pendente **uma única vez** (via `npm run migrate`). |
 
 ### `src/database/sql.ts`
 
@@ -202,7 +208,10 @@ Tipos de domínio após parse da planilha:
 | `closeSqlServerPool()` | Fecha pool no shutdown. |
 | `pingSqlServer(config)` | Conexão efêmera + `SELECT 1` para readiness. |
 | `IMPORT_UNIFIED_TABLE` | Nome fixo da tabela: `import_unified`. |
-| `CREATE_IMPORT_UNIFIED_TABLE_SQL` | Script idempotente `IF NOT EXISTS` com PK `(import_batch_id, pedido_id)`. |
+
+### `src/database/migrations/`
+
+Scripts versionados (`001_create_import_unified_table`, etc.) registrados em `schema_migrations` após aplicação.
 
 ---
 
@@ -224,7 +233,7 @@ Durante qualquer etapa acima, erros tipados sobem até o error handler do Fastif
 | `BadRequestError` | 400 | Multipart inválido ou arquivo grande. |
 | `ExcelReadError` | 400 | Planilha ilegível, coluna faltando, célula inválida. |
 | `ImportRelationError` | 422 | Órfãos com `fail`, IDs duplicados. |
-| `SqlPersistenceError` | 503 | Falha de conexão, DDL ou insert no SQL. |
+| `SqlPersistenceError` | 503 | Falha de conexão, migration ou insert no SQL. |
 | `ServiceUnavailableError` | 503 | Import chamado sem SQL configurado (`IMPORT_NOT_CONFIGURED`). |
 
 ---
@@ -274,7 +283,7 @@ Não passa pelo import, mas faz parte do mesmo `app.ts`:
 | `readers/` | Infraestrutura de leitura Excel |
 | `utils/` | Regras puras (relate, sheet, multipart, readiness) |
 | `repositories/` | Acesso a dados (insert em lote) |
-| `database/` | Conexão e DDL SQL Server |
+| `database/` | Conexão SQL Server e migrations versionadas |
 | `models/` + `types/` | Contratos de dados |
 | `errors/` | Erros com status HTTP |
 | `plugins/` | Extensões Fastify (OpenAPI) |

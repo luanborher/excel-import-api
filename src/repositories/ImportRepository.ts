@@ -1,11 +1,7 @@
 import sql from 'mssql';
 
 import type { SqlServerConfig } from '../config/index.js';
-import {
-  CREATE_IMPORT_UNIFIED_TABLE_SQL,
-  getSqlServerPool,
-  IMPORT_UNIFIED_TABLE,
-} from '../database/sql.js';
+import { getSqlServerPool, IMPORT_UNIFIED_TABLE } from '../database/sql.js';
 import { getErrorMessage } from '../errors/AppError.js';
 import { SqlPersistenceError } from '../errors/SqlPersistenceError.js';
 import type { PersistImportResult, UnifiedImportRow } from '../types/import.js';
@@ -14,17 +10,6 @@ const INSERT_CHUNK_SIZE = 100;
 
 export class ImportRepository {
   constructor(private readonly config: SqlServerConfig) {}
-
-  async ensureSchema(): Promise<void> {
-    try {
-      const pool = await getSqlServerPool(this.config);
-      await pool.request().query(CREATE_IMPORT_UNIFIED_TABLE_SQL);
-    } catch (error) {
-      throw new SqlPersistenceError('Falha ao garantir schema da tabela de importação', {
-        cause: getErrorMessage(error),
-      });
-    }
-  }
 
   async insertBatch(batchId: string, rows: UnifiedImportRow[]): Promise<PersistImportResult> {
     if (rows.length === 0) {
@@ -41,8 +26,6 @@ export class ImportRepository {
     await transaction.begin();
 
     try {
-      await new sql.Request(transaction).query(CREATE_IMPORT_UNIFIED_TABLE_SQL);
-
       for (let offset = 0; offset < rows.length; offset += INSERT_CHUNK_SIZE) {
         const chunk = rows.slice(offset, offset + INSERT_CHUNK_SIZE);
         await insertRowsChunk(transaction, batchId, chunk);

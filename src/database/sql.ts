@@ -69,26 +69,3 @@ export async function pingSqlServer(config: SqlServerConfig): Promise<boolean> {
 }
 
 export const IMPORT_UNIFIED_TABLE = 'import_unified';
-
-export const CREATE_IMPORT_UNIFIED_TABLE_SQL = `
-IF OBJECT_ID(N'dbo.${IMPORT_UNIFIED_TABLE}', N'U') IS NULL
-BEGIN
-  CREATE TABLE dbo.${IMPORT_UNIFIED_TABLE} (
-    import_batch_id UNIQUEIDENTIFIER NOT NULL,
-    pedido_id INT NOT NULL,
-    cliente_id INT NOT NULL,
-    valor DECIMAL(18, 2) NOT NULL,
-    produto NVARCHAR(255) NOT NULL,
-    cliente_nome NVARCHAR(255) NOT NULL,
-    cliente_email NVARCHAR(255) NULL,
-    imported_at DATETIME2 NOT NULL CONSTRAINT DF_${IMPORT_UNIFIED_TABLE}_imported_at DEFAULT (SYSUTCDATETIME()),
-    CONSTRAINT PK_${IMPORT_UNIFIED_TABLE} PRIMARY KEY (import_batch_id, pedido_id)
-  );
-END;
-
-IF COL_LENGTH(N'dbo.${IMPORT_UNIFIED_TABLE}', N'produto') IS NULL
-BEGIN
-  ALTER TABLE dbo.${IMPORT_UNIFIED_TABLE}
-    ADD produto NVARCHAR(255) NOT NULL CONSTRAINT DF_${IMPORT_UNIFIED_TABLE}_produto DEFAULT (N'');
-END;
-`;
