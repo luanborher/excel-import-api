@@ -9,7 +9,7 @@ export type OrphanPedido = {
 export class ImportRelationError extends AppError {
   constructor(
     message: string,
-    readonly relationCode: 'DUPLICATE_CLIENTE_ID' | 'DUPLICATE_PEDIDO_ID' | 'ORPHAN_PEDIDOS',
+    readonly relationCode: 'DUPLICATE_CLIENTE_ID' | 'DUPLICATE_PEDIDO_ID',
     details?: unknown,
   ) {
     super(message, relationCode, 422, details);

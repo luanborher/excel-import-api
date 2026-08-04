@@ -18,6 +18,7 @@ describe('relacionamento clientes e pedidos', () => {
   it('gera uma linha unificada por pedido com dados do cliente', () => {
     const result = relateClientesPedidos(clientes, pedidos);
 
+    expect(result.skippedPedidos).toEqual([]);
     expect(result.rows).toEqual([
       {
         pedidoId: 101,
@@ -42,5 +43,18 @@ describe('relacionamento clientes e pedidos', () => {
     const result = relateClientesPedidos(clientes, []);
 
     expect(result.rows).toEqual([]);
+    expect(result.skippedPedidos).toEqual([]);
+  });
+
+  it('pula pedidos órfãos e unifica apenas os válidos', () => {
+    const pedidosComOrfao: Pedido[] = [
+      ...pedidos,
+      { id: 103, clienteId: 999, valor: 42, produto: 'Teclado' },
+    ];
+
+    const result = relateClientesPedidos(clientes, pedidosComOrfao);
+
+    expect(result.rows).toHaveLength(2);
+    expect(result.skippedPedidos).toEqual([{ pedidoId: 103, clienteId: 999, valor: 42 }]);
   });
 });

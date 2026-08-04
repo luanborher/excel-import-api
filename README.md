@@ -181,9 +181,9 @@ docker/
 ## Fluxo da importação
 
 1. `ExcelReader` lê `clientes.xlsx` e `pedidos.xlsx`
-2. `relateClientesPedidos` relaciona pedidos ao cliente e valida (órfãos, IDs duplicados)
+2. `relateClientesPedidos` relaciona pedidos ao cliente (órfãos são ignorados e listados no relatório; IDs duplicados falham)
 3. `ImportRepository` grava linhas unificadas em `import_unified` (transação SQL, insert em chunks)
-4. API retorna relatório (`batchId`, linhas inseridas, pedidos ignorados, etc.)
+4. API retorna relatório (`batchId`, linhas inseridas, `skippedPedidos`, etc.)
 
 ## Stack
 
@@ -202,4 +202,4 @@ docker/
 | `clientes.xlsx` | `id`, `nome`, `email` |
 | `pedidos.xlsx` | `id`, `cliente_id`, `valor`, `produto` |
 
-Pedidos com `cliente_id` inexistente na planilha de clientes retornam **422** (`ORPHAN_PEDIDOS`).
+Pedidos com `cliente_id` inexistente na planilha de clientes são **ignorados** (`skippedPedidos` no relatório 201). IDs duplicados de cliente/pedido na mesma planilha retornam **422**.

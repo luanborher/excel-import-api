@@ -1,3 +1,5 @@
+import type { OrphanPedido } from '../errors/ImportRelationError.js';
+
 export type ExcelInput = string | Buffer | ArrayBuffer | Uint8Array;
 
 export type UnifiedImportRow = {
@@ -20,6 +22,7 @@ export type ImportReport = {
   tableName: string;
   rowsInserted: number;
   unifiedRows: number;
+  skippedPedidos: OrphanPedido[];
 };
 
 export type PersistImportResult = {

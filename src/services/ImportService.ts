@@ -17,7 +17,7 @@ export class ImportService {
       this.excelReader.readPedidos(input.pedidos),
     ]);
 
-    const { rows } = relateClientesPedidos(clientes, pedidos);
+    const { rows, skippedPedidos } = relateClientesPedidos(clientes, pedidos);
 
     const batchId = input.batchId ?? randomUUID();
     const persisted = await this.repository.insertBatch(batchId, rows);
@@ -27,6 +27,7 @@ export class ImportService {
       tableName: persisted.tableName,
       rowsInserted: persisted.rowsInserted,
       unifiedRows: rows.length,
+      skippedPedidos,
     };
   }
 }

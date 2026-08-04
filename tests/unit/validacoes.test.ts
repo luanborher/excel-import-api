@@ -19,19 +19,16 @@ const pedidos: Pedido[] = [
 ];
 
 describe('validações de relacionamento', () => {
-  it('rejeita pedidos órfãos (cliente_id inexistente)', () => {
+  it('pula pedidos órfãos (cliente_id inexistente) e mantém os válidos', () => {
     const pedidosComOrfao: Pedido[] = [
       ...pedidos,
       { id: 103, clienteId: 999, valor: 42, produto: 'X' },
     ];
 
-    expect(() => relateClientesPedidos(clientes, pedidosComOrfao)).toThrow(ImportRelationError);
+    const result = relateClientesPedidos(clientes, pedidosComOrfao);
 
-    try {
-      relateClientesPedidos(clientes, pedidosComOrfao);
-    } catch (error) {
-      expect(error).toMatchObject({ code: 'ORPHAN_PEDIDOS' });
-    }
+    expect(result.rows).toHaveLength(2);
+    expect(result.skippedPedidos).toEqual([{ pedidoId: 103, clienteId: 999, valor: 42 }]);
   });
 
   it('rejeita clientes com id duplicado na planilha', () => {

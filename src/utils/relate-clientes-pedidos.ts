@@ -5,6 +5,7 @@ import { ImportRelationError, type OrphanPedido } from '../errors/ImportRelation
 
 export type RelateClientesPedidosResult = {
   rows: UnifiedImportRow[];
+  skippedPedidos: OrphanPedido[];
 };
 
 function buildClienteIndex(clientes: Cliente[]): Map<number, Cliente> {
@@ -73,15 +74,5 @@ export function relateClientesPedidos(
     });
   }
 
-  if (orphans.length > 0) {
-    throw new ImportRelationError(
-      'Pedidos com cliente_id inexistente na planilha de clientes',
-      'ORPHAN_PEDIDOS',
-      {
-        pedidos: orphans,
-      },
-    );
-  }
-
-  return { rows };
+  return { rows, skippedPedidos: orphans };
 }

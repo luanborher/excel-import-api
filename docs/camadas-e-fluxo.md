@@ -163,7 +163,7 @@ Reexporta `loadEnv`, `getImportMaxFileSizeBytes`, `resolveSqlServerConfig` e tip
 
 | Função / tipo | O que faz |
 |---------------|-----------|
-| `relateClientesPedidos` | Para cada pedido, busca o cliente pelo `clienteId`. Pedido sem cliente na planilha → `ImportRelationError` (422). |
+| `relateClientesPedidos` | Para cada pedido, busca o cliente pelo `clienteId`. Pedido sem cliente → entra em `skippedPedidos` (não interrompe o lote). |
 
 ### `src/models/Cliente.ts` / `src/models/Pedido.ts`
 
@@ -232,7 +232,7 @@ Durante qualquer etapa acima, erros tipados sobem até o error handler do Fastif
 |--------|------|--------|
 | `BadRequestError` | 400 | Multipart inválido ou arquivo grande. |
 | `ExcelReadError` | 400 | Planilha ilegível, coluna faltando, célula inválida. |
-| `ImportRelationError` | 422 | Órfãos com `fail`, IDs duplicados. |
+| `ImportRelationError` | 422 | IDs duplicados de cliente/pedido na planilha. |
 | `SqlPersistenceError` | 503 | Falha de conexão, migration ou insert no SQL. |
 | `ServiceUnavailableError` | 503 | Import chamado sem SQL configurado (`IMPORT_NOT_CONFIGURED`). |
 
